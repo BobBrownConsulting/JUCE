@@ -435,7 +435,7 @@ void LookAndFeel::playAlertSound()
 }
 
 //==============================================================================
-class iOSMessageBox;
+class iOSMessageBox; 
 
 #if defined (__IPHONE_8_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_8_0
  #define JUCE_USE_NEW_IOS_ALERTWINDOW 1
