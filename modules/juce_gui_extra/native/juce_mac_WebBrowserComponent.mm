@@ -1,3 +1,4 @@
+#if 0
 /*
   ==============================================================================
 
@@ -489,3 +490,4 @@ void WebBrowserComponent::clearCookies()
 }
 
 } // namespace juce
+#endif
