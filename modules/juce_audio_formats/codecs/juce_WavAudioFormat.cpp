@@ -1695,7 +1695,9 @@ private:
         auto channelMask = getChannelMaskFromChannelLayout (channelLayout);
 
         const bool isRF64 = (bytesWritten >= 0x100000000LL);
-        const bool isWaveFmtEx = isRF64 || (channelMask != 0);
+        const bool isWaveFmtEx = isRF64 || (channelMask != 0) 
+        || channelLayout == AudioChannelSet::create9point1point4()
+        || channelLayout == AudioChannelSet::create9point1point6();
 
         int64 riffChunkSize = (int64) (4 /* 'RIFF' */ + 8 + 40 /* WAVEFORMATEX */
                                        + 8 + audioDataSize + (audioDataSize & 1)
@@ -1842,6 +1844,12 @@ private:
 
         if (layout == AudioChannelSet::create7point1point4())
             return 0x0002d63f;
+
+        if (layout == AudioChannelSet::create9point1point4())
+            return 0x0;
+
+        if (layout == AudioChannelSet::create9point1point6())
+            return 0x0;
 
         auto channels = layout.getChannelTypes();
         auto wavChannelMask = 0;
@@ -1993,6 +2001,12 @@ bool WavAudioFormat::isChannelLayoutSupported (const AudioChannelSet& channelSet
         return true;
 
     if (channelSet == AudioChannelSet::create7point1point4())
+        return true;
+
+    if (channelSet == AudioChannelSet::create9point1point4())
+        return true;
+
+    if (channelSet == AudioChannelSet::create9point1point6())
         return true;
 
     // WAV supports all channel types from left ... topRearRight
