@@ -1828,8 +1828,20 @@ private:
         // The channel mask 0x0000063f is used by both Pro Tools and Dolby Atmos Renderer
         // when exporting 7.1 files, so we need to use it here to avoid any compatibility issues.
         //
+        if (layout == AudioChannelSet::create5point1point2())
+            return 0x0000503f;
+
+        if (layout == AudioChannelSet::create5point1point4())
+            return 0x0002d03f;
+
         if (layout == AudioChannelSet::create7point1())
             return 0x0000063f;
+
+        if (layout == AudioChannelSet::create7point1point2())
+            return 0x0000563f;
+
+        if (layout == AudioChannelSet::create7point1point4())
+            return 0x0002d63f;
 
         auto channels = layout.getChannelTypes();
         auto wavChannelMask = 0;
@@ -1968,7 +1980,19 @@ bool WavAudioFormat::isChannelLayoutSupported (const AudioChannelSet& channelSet
     if (channelSet.isDiscreteLayout())
         return true;
 
+    if (channelSet == AudioChannelSet::create5point1point2())
+        return true;
+
+    if (channelSet == AudioChannelSet::create5point1point4())
+        return true;
+
     if (channelSet == AudioChannelSet::create7point1())
+        return true;
+
+    if (channelSet == AudioChannelSet::create7point1point2())
+        return true;
+
+    if (channelSet == AudioChannelSet::create7point1point4())
         return true;
 
     // WAV supports all channel types from left ... topRearRight
