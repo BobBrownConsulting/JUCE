@@ -1710,7 +1710,9 @@ private:
         auto channelMask = getChannelMaskFromChannelLayout (channelLayout);
 
         const bool isRF64 = (bytesWritten >= 0x100000000LL);
-        const bool isWaveFmtEx = isRF64 || (channelMask != 0);
+        const bool isWaveFmtEx = isRF64 || (channelMask != 0) 
+        || channelLayout == AudioChannelSet::create9point1point4()
+        || channelLayout == AudioChannelSet::create9point1point6();
 
         int64 riffChunkSize = (int64) (4 /* 'RIFF' */ + 8 + 40 /* WAVEFORMATEX */
                                        + 8 + audioDataSize + (audioDataSize & 1)
@@ -1839,6 +1841,30 @@ private:
         // interpret a wav file with only one or two channels to be mono or stereo anyway.
         if (layout == AudioChannelSet::mono() || layout == AudioChannelSet::stereo())
             return 0;
+
+        // The channel mask 0x0000063f is used by both Pro Tools and Dolby Atmos Renderer
+        // when exporting 7.1 files, so we need to use it here to avoid any compatibility issues.
+        //
+        if (layout == AudioChannelSet::create5point1point2())
+            return 0x0000503f;
+
+        if (layout == AudioChannelSet::create5point1point4())
+            return 0x0002d03f;
+
+        if (layout == AudioChannelSet::create7point1())
+            return 0x0000063f;
+
+        if (layout == AudioChannelSet::create7point1point2())
+            return 0x0000563f;
+
+        if (layout == AudioChannelSet::create7point1point4())
+            return 0x0002d63f;
+
+        if (layout == AudioChannelSet::create9point1point4())
+            return 0x0;
+
+        if (layout == AudioChannelSet::create9point1point6())
+            return 0x0;
 
         auto channels = layout.getChannelTypes();
         auto wavChannelMask = 0;
@@ -1978,6 +2004,27 @@ bool WavAudioFormat::isChannelLayoutSupported (const AudioChannelSet& channelSet
 
     // When
     if (channelSet.isDiscreteLayout())
+        return true;
+
+    if (channelSet == AudioChannelSet::create5point1point2())
+        return true;
+
+    if (channelSet == AudioChannelSet::create5point1point4())
+        return true;
+
+    if (channelSet == AudioChannelSet::create7point1())
+        return true;
+
+    if (channelSet == AudioChannelSet::create7point1point2())
+        return true;
+
+    if (channelSet == AudioChannelSet::create7point1point4())
+        return true;
+
+    if (channelSet == AudioChannelSet::create9point1point4())
+        return true;
+
+    if (channelSet == AudioChannelSet::create9point1point6())
         return true;
 
     // WAV supports all channel types from left ... topRearRight
